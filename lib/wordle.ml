@@ -18,6 +18,8 @@ let random_word =
   let valid_words = load_valid_words () in
   BatList.at valid_words random_number
 
+
+
 (* [check guess] is true or false depending on whether the user has inputted the correct guess *)
 let check correct guess = correct = guess
 
@@ -28,15 +30,6 @@ let make_list str =
   let characters = String.to_list str in
   BatList.of_enum (List.enum characters) 
 
-(* let validate_word user_input =
-  let str_lst = make_list user_input in
-  let valid_guesses = load_valid_guesses () in
-  if BatList.length str_lst <> 5 then
-    print_endline "Invalid word: Your word must be exactly 5 letters long."
-  else if BatList.mem user_input valid_guesses = false then 
-    print_endline ("Invalid word: Word was not recognized, try another.")
-  else () *)
-
 let validate_length str_lst = 
     BatList.length str_lst = 5
   
@@ -44,23 +37,13 @@ let validate_word user_input =
   let valid_guesses = load_valid_guesses () in 
   BatList.mem user_input valid_guesses
 
-
-
-  
-
-
-
-(* WIP.... SYNTAX ERROR... WANT TO RETURN TRUE OR FALSE
-let validate_word user_input =
+let validate user_input =
   let str_lst = make_list user_input in
-  let valid_guesses = load_valid_guesses () in
-  if BatList.length str_lst <> 5 then
-    print_endline "Invalid word: Your word must be exactly 5 letters long.";
-    false;
-  else if BatList.mem user_input valid_guesses then 
-    print_endline "Invalid word: Word was not recognized, try another.";
-    false
-  else true *)
+  validate_length str_lst && validate_word user_input
+
+
+
+
 
 (* let check_word user_input word =
   let str_lst = make_list word in

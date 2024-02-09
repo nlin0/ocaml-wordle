@@ -3,15 +3,11 @@ open A2.Wordle
 (* FOR USER INTERFACE: Printing Output or reading output*)
 (* TODO: can have validate_word return a number.. and let count = count + 1*)
 
-let validate user_input =
-  let str_lst = make_list user_input in
-  validate_length str_lst && validate_word user_input
-
 let rec prompt_guess secret_word count =
   let count = count - 1 in
   if count = 0 then lose_prompt secret_word
   else let () =
-    print_endline ("You have " ^ string_of_int count ^ " guesses. \n>");
+    print_endline ("Wrong. " ^ string_of_int count ^ " guesses left. \n>");
   in let user_guess = read_line () in
     if validate user_guess = false then let () =
       print_endline "Invalid word. Word must be a 5 letter recognized word"
@@ -22,7 +18,7 @@ let rec prompt_guess secret_word count =
   
 let first_guess secret_word user_guess =
   if validate user_guess = false then let () =
-    print_endline "Invalid word. Word must be a 5 letter recognized word"
+    print_endline "Invalid word. Word must be a 5 letter recognized word."
     in prompt_guess secret_word 6
   else if check secret_word user_guess = true then
     print_endline (user_guess ^ " is correct! Good Job, you win.")
@@ -38,8 +34,8 @@ let start () =
     print_endline "\nWelcome to Wordle, a word guessing game!";
     print_endline "\nType 'quit' to quit the game.";
     print_endline "Type 'cheat' to view the answer.";
-    print_endline "Otherwise, type your first guess.";
-    print_endline "(NOTE: You cannot cheat after you start!) \n> "
+    print_endline "Otherwise, type your first guess (must be all lowercase).";
+    print_endline "NOTE: You cannot cheat after you start. \n> "
   in
   let user_guess = read_line () in
   if user_guess = "quit" then ()
