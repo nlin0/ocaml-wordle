@@ -3,7 +3,6 @@ open A2.Wordle
 (* FOR USER INTERFACE: Printing Output or reading output*)
 
 let rec prompt_guess secret_word count =
-  let () = validate_word secret_word in
   let count = count - 1 in
   if count = 0 then lose_prompt secret_word
   else
@@ -12,6 +11,7 @@ let rec prompt_guess secret_word count =
       print_endline "Type your guess: \n> "
     in
     let user_guess = read_line () in
+    let () = validate_word user_guess in
     if check secret_word user_guess = true then
       print_endline (user_guess ^ " is correct. Good Job, you win!")
     else prompt_guess secret_word count

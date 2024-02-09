@@ -33,9 +33,10 @@ let validate_word user_input =
   let valid_guesses = load_valid_guesses () in
   if BatList.length str_lst <> 5 then
     print_endline "Invalid word: Your word must be exactly 5 letters long."
-  else if BatList.mem user_input valid_guesses then 
-    print_endline "Invalid word: Word was not recognized, try another."
+  else if BatList.mem user_input valid_guesses = false then 
+    print_endline ("Invalid word: Word was not recognized, try another.")
   else ()
+
 
 
 (* WIP.... SYNTAX ERROR... WANT TO RETURN TRUE OR FALSE
