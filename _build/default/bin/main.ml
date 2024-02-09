@@ -3,22 +3,21 @@ open A2.Wordle
 (* FOR USER INTERFACE: Printing Output or reading output*)
 
 let rec prompt_guess secret_word count =
-  (* subtract one count *)
+  let () = validate_word secret_word in
   let count = count - 1 in
-  (* base case: no lives left *)
   if count = 0 then lose_prompt secret_word
   else
     let () =
       print_endline ("You have " ^ string_of_int count ^ " guesses.");
       print_endline "Type your guess: \n> "
     in
-    
     let user_guess = read_line () in
     if check secret_word user_guess = true then
       print_endline (user_guess ^ " is correct. Good Job, you win!")
     else prompt_guess secret_word count
 
 let first_guess word guess =
+  let () = validate_word guess in
   if check word guess = true then
     print_endline (guess ^ " is correct! Good Job, you win.")
   else if check word guess <> true then prompt_guess word 5

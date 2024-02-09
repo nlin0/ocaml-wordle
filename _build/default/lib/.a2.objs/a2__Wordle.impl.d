@@ -1,1 +1,1 @@
-lib/wordle.pp.ml: BatFile BatList Batteries Ppx_inline_test_lib Random
+lib/wordle.pp.ml: BatFile BatList Batteries List Ppx_inline_test_lib Random String
