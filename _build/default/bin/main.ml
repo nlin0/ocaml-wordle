@@ -1,26 +1,32 @@
 open A2.Wordle
 
 (* FOR USER INTERFACE: Printing Output or reading output*)
+(* TODO: can have validate_word return a number.. and let count = count + 1*)
+
+let validate user_input =
+  let str_lst = make_list user_input in
+  validate_length str_lst && validate_word user_input
 
 let rec prompt_guess secret_word count =
   let count = count - 1 in
   if count = 0 then lose_prompt secret_word
-  else
-    let () =
-      print_endline ("You have " ^ string_of_int count ^ " guesses.");
-      print_endline "Type your guess: \n> "
-    in
-    let user_guess = read_line () in
-    let () = validate_word user_guess in
-    if check secret_word user_guess = true then
+  else let () =
+    print_endline ("You have " ^ string_of_int count ^ " guesses. \n>");
+  in let user_guess = read_line () in
+    if validate user_guess = false then let () =
+      print_endline "Invalid word. Word must be a 5 letter recognized word"
+      in prompt_guess secret_word (count + 1)
+    else if check secret_word user_guess = true then
       print_endline (user_guess ^ " is correct. Good Job, you win!")
     else prompt_guess secret_word count
-
-let first_guess word guess =
-  let () = validate_word guess in
-  if check word guess = true then
-    print_endline (guess ^ " is correct! Good Job, you win.")
-  else if check word guess <> true then prompt_guess word 5
+  
+let first_guess secret_word user_guess =
+  if validate user_guess = false then let () =
+    print_endline "Invalid word. Word must be a 5 letter recognized word"
+    in prompt_guess secret_word 6
+  else if check secret_word user_guess = true then
+    print_endline (user_guess ^ " is correct! Good Job, you win.")
+  else if check secret_word user_guess <> true then prompt_guess secret_word 5
 
 let prompt_cheat secret_word =
   let () = print_endline ("The answer is " ^ secret_word) in
