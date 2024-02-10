@@ -1,6 +1,8 @@
 open Batteries
 
-let test x y = x + y
+type feedback = { correct_position : bool; correct_letter : bool; 
+                  print_statement : string }
+type letter_feedback = { letter : char; info : feedback }
 (* GAME LOGIC *)
 
 (* loads the dictionary of valid words *)
@@ -19,8 +21,46 @@ let random_word =
   let valid_words = load_valid_words () in
   BatList.at valid_words random_number
 
+let assign_feedback answer guess c =
+  if String.contains answer c = false then
+    { letter = c; info = { correct_position = false; correct_letter = false;
+    print_statement = "Incorrect." } }
+  else let correct_position = String.index answer c in
+  match (guess.[correct_position] = c, String.contains answer c) with
+  | true, true ->
+      { letter = c; info = { correct_position = true; correct_letter = true ;
+      print_statement = "Correct."} }
+
+  | false, true ->
+      { letter = c; info = { correct_position = false; correct_letter = true;
+      print_statement = "Incorrect Position." } }
+  | _ -> 
+    { letter = c; info = { correct_position = false; correct_letter = false;
+    print_statement = "Incorrect." } }
+
+let test_feedback answer guess =
+  let feedback_list = BatList.map (assign_feedback answer guess) (BatString.to_list guess) in
+  BatList.iter (fun feedback ->
+    Printf.printf "%c : %s\n"
+      feedback.letter feedback.info.print_statement
+  ) feedback_list
+
 (* [check guess] is true or false depending on whether the user has inputted the correct guess *)
-let check correct guess = correct = guess
+let check answer guess = answer = guess
 
 let lose_prompt word =
   print_string ("You have ran out of lives. The word was " ^ word ^ ". \n")
+
+let make_list str =
+  let characters = String.to_list str in
+  BatList.of_enum (List.enum characters)
+
+let validate_length str_lst = BatList.length str_lst = 5
+
+let validate_word user_input =
+  let valid_guesses = load_valid_guesses () in
+  BatList.mem user_input valid_guesses
+
+let validate user_input =
+  let str_lst = make_list user_input in
+  validate_length str_lst && validate_word user_input
