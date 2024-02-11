@@ -46,6 +46,13 @@ let print_feedback = function
   | WrongDuplicate -> "Wrong Position. Word has duplicates of this letter."
   | RightDuplicate -> "Correct. Word has duplicates of this letter."
 
+(* let print_answer info_list =
+   BatList.iter
+     (fun info ->
+       Printf.printf "Info_List: \nLetter: %c, dupe: %b, Position: %d\n"
+         info.aletter info.dupe info.pos)
+     info_list *)
+
 let check_through answer guess =
   let answer_list = make_answer_list answer in
   let guess_list = make_list guess in
@@ -54,11 +61,17 @@ let check_through answer guess =
       if ans_info.dupe = true then
         match ans_info.aletter = c with
         | true -> Printf.printf "%c : %s \n" c (print_feedback RightDuplicate)
-        | false -> Printf.printf "%c : %s \n" c (print_feedback WrongDuplicate)
+        | false ->
+          (* add a check that differentiates between incorrect and wrong duplicate *)
+            if ans_info.aletter = c = false then
+              Printf.printf "test 2 %c : %s \n" c (print_feedback Incorrect)
+            else
+              Printf.printf "test 1 %c : %s \n" c
+                (print_feedback WrongDuplicate)
       else
         match ans_info.aletter = c with
-        | true -> Printf.printf "%c : %s \n" c (print_feedback Correct)
-        | false -> Printf.printf "%c : %s \n" c (print_feedback Incorrect))
+        | true -> Printf.printf "3 %c : %s \n" c (print_feedback Correct)
+        | false -> Printf.printf "4 %c : %s \n" c (print_feedback Incorrect))
     answer_list guess_list
 
 (* let print_feedback answer guess =

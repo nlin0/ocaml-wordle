@@ -31,14 +31,14 @@ let first_guess secret_word user_guess =
     print_endline (user_guess ^ " is correct! Good Job, you win.")
   else if check secret_word user_guess <> true then
     let () = check_through secret_word user_guess in
-    prompt_guess secret_word 5 
+    prompt_guess secret_word 5
 
 let prompt_cheat secret_word =
   let () = print_endline ("The answer is " ^ secret_word) in
   prompt_guess secret_word 6
 
 let start () =
-  let secret_word = "trice" in
+  let secret_word = "tweet" in
   (* let secret_word = random_word in *)
   let () =
     print_endline "\nWelcome to Wordle, a word guessing game!";
