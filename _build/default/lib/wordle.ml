@@ -19,8 +19,23 @@ let print_feedback = function
   | WrongDuplicate -> "Wrong Position. Word has duplicates of this letter."
   | RightDuplicate -> "Correct. Word has duplicates of this letter."
 
+let print_colored_feedback feedbck c color =
+  let str = print_feedback feedbck in
 
-  
+  ANSITerminal.printf
+    [ ANSITerminal.Bold; color; ANSITerminal.on_default ]
+    "%c: " c;
+  ANSITerminal.printf [ color; ANSITerminal.on_white ] "%s " str;
+  ANSITerminal.printf [ color; ANSITerminal.on_default ] "\n"
+
+let print_char_feedback feedbck c =
+  match feedbck with
+  | Correct -> print_colored_feedback feedbck c ANSITerminal.green
+  | Incorrect -> print_colored_feedback feedbck c ANSITerminal.red
+  | IncorrectPosition -> print_colored_feedback feedbck c ANSITerminal.yellow
+  | WrongDuplicate -> print_colored_feedback feedbck c ANSITerminal.cyan
+  | RightDuplicate -> print_colored_feedback feedbck c ANSITerminal.green
+
 (** [load_valid_words ()] is the string list of guessable words loaded from 
     a .txt file*)
 let load_valid_words () =
@@ -42,6 +57,7 @@ let random_word =
   BatList.at valid_words random_number
 
 (* HELPER FUNCTIONS *)
+
 (** [make_list str] is a list consisting of characters of [str] *)
 let make_list str =
   let characters = String.to_list str in
@@ -49,8 +65,7 @@ let make_list str =
 
 (** [check answer guess] is true when [answer] is the same as [guess], false
     otherwise *)
-let check answer guess = 
-  answer = guess
+let check answer guess = answer = guess
 
 let lose_prompt word =
   print_string ("You have ran out of lives. The word was " ^ word ^ ". \n")
@@ -81,15 +96,15 @@ let make_guess_list answer guess =
 
 let dupe_match contains_dupe c =
   match contains_dupe with
-  | true -> Printf.printf "%c : %s \n" c (print_feedback RightDuplicate)
-  | false -> Printf.printf "%c : %s \n" c (print_feedback Correct)
+  | true -> print_char_feedback RightDuplicate c
+  | false -> print_char_feedback Correct c
 
 let dupe_no_match contains_dupe answer c =
   if BatString.contains answer c then
     match contains_dupe = true with
-    | true -> Printf.printf "%c : %s \n" c (print_feedback WrongDuplicate)
-    | false -> Printf.printf "%c : %s \n" c (print_feedback IncorrectPosition)
-  else Printf.printf "%c : %s \n" c (print_feedback Incorrect)
+    | true -> print_char_feedback WrongDuplicate c
+    | false -> print_char_feedback IncorrectPosition c
+  else print_char_feedback Incorrect c
 
 let check_through answer guess =
   let answer_list = make_answer_list answer in
