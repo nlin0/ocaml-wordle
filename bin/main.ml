@@ -38,8 +38,7 @@ let prompt_cheat secret_word =
   prompt_guess secret_word 6
 
 let start () =
-  let secret_word = "speed" in
-  (* let secret_word = random_word in *)
+  let secret_word = random_word in
   let () =
     print_endline "\nWelcome to Wordle, a word guessing game!";
     print_endline "\nType 'quit' to quit the game.";
