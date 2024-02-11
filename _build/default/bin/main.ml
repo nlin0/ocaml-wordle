@@ -5,32 +5,25 @@ open A2.Wordle
 let rec prompt_guess secret_word count =
   let count = count - 1 in
   if count = 0 then lose_prompt secret_word
-  else
-    let () =
-      print_endline ("Wrong. " ^ string_of_int count ^ " guesses left. \n>")
-    in
+  else let () =
+      print_endline ("Wrong. " ^ string_of_int count ^ " guesses left. \n>") in
     let user_guess = read_line () in
-    if validate user_guess = false then
-      let () =
-        print_endline "Invalid word. Word must be a 5 letter recognized word"
-      in
+    if validate user_guess = false then let () =
+        print_endline "Invalid word. Word must be a 5 letter recognized word" in
       prompt_guess secret_word (count + 1)
     else if check secret_word user_guess = true then
       print_endline (user_guess ^ " is correct. Good Job, you win!")
-    else
-      let () = test_feedback secret_word user_guess in
+    else let () = test_feedback secret_word user_guess in
       prompt_guess secret_word count
 
 let first_guess secret_word user_guess =
-  if validate user_guess = false then
-    let () =
-      print_endline "Invalid word. Word must be a 5 letter recognized word."
-    in
+  if validate user_guess = false then let () =
+      print_endline "Invalid word. Word must be a 5 letter recognized word." in
     prompt_guess secret_word 6
   else if check secret_word user_guess = true then
     print_endline (user_guess ^ " is correct! Good Job, you win.")
-  else if check secret_word user_guess <> true then
-    let () = test_feedback secret_word user_guess in
+  else if check secret_word user_guess <> true then let () = 
+    test_feedback secret_word user_guess in
     prompt_guess secret_word 5
 
 let prompt_cheat secret_word =
