@@ -1,6 +1,6 @@
 (library
  (inline_tests)
  (name a2)
- (libraries batteries)
+ (libraries batteries ANSITerminal)
  (preprocess
   (pps ppx_inline_test)))
