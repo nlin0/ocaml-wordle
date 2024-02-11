@@ -18,7 +18,7 @@ let rec prompt_guess secret_word count =
     else if check secret_word user_guess = true then
       print_endline (user_guess ^ " is correct. Good Job, you win!")
     else
-      let () = print_feedback secret_word user_guess in
+      let () = check_through secret_word user_guess in
       prompt_guess secret_word count
 
 let first_guess secret_word user_guess =
@@ -30,8 +30,8 @@ let first_guess secret_word user_guess =
   else if check secret_word user_guess = true then
     print_endline (user_guess ^ " is correct! Good Job, you win.")
   else if check secret_word user_guess <> true then
-    let () = print_feedback secret_word user_guess in
-    prompt_guess secret_word 5
+    let () = check_through secret_word user_guess in
+    prompt_guess secret_word 5 
 
 let prompt_cheat secret_word =
   let () = print_endline ("The answer is " ^ secret_word) in
