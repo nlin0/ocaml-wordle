@@ -62,15 +62,16 @@ let check_through answer guess =
         match ans_info.aletter = c with
         | true -> Printf.printf "%c : %s \n" c (print_feedback RightDuplicate)
         | false ->
-            if ans_info.aletter = c = false then
-              Printf.printf "test 2 %c : %s \n" c (print_feedback Incorrect)
-            else
-              Printf.printf "test 1 %c : %s \n" c
-                (print_feedback WrongDuplicate)
+            (* add a check that differentiates between incorrect and wrong duplicate *)
+            if BatString.contains answer c then
+              Printf.printf "%c : %s \n" c (print_feedback WrongDuplicate)
+            else Printf.printf "%c : %s \n" c (print_feedback Incorrect)
       else
         match ans_info.aletter = c with
-        | true -> Printf.printf "3 %c : %s \n" c (print_feedback Correct)
-        | false -> Printf.printf "4 %c : %s \n" c (print_feedback Incorrect))
+        | true -> Printf.printf "%c : %s \n" c (print_feedback Correct)
+        | false ->
+            Printf.printf "a.letter : %c %c : %s \n" ans_info.aletter c
+              (print_feedback IncorrectPosition))
     answer_list guess_list
 
 (* let print_feedback answer guess =
