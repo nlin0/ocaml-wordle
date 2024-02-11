@@ -1,7 +1,7 @@
 open Batteries
 
 type feedback = { letter : char; print_statement : string }
-type letter_info = { aletter : char; checked : bool; pos : int }
+type letter_info = { aletter : char; dupe : bool; pos : int }
 (* GAME LOGIC *)
 
 (* loads the dictionary of valid words *)
@@ -25,51 +25,64 @@ let make_list str =
   BatList.of_enum (List.enum characters)
 
 let make_info_list answer =
-    BatList.mapi (fun pos c -> {aletter = c ; checked = false ; pos = pos})
+    BatList.mapi (fun pos c -> 
+      let count = BatString.count_string (String.make 1 c) answer in 
+      let () = Printf.printf ("%s : %d \n") (String.make 1 c) count in
+      if (BatString.count_string (String.make 1 c) answer) > 1 then
+        {aletter = c ; dupe = false ; pos = pos}
+      else {aletter = c ; dupe = true ; pos = pos}
+      )
     (make_list answer) 
 
 let print_answer info_list = 
   BatList.iter (fun info ->
-    Printf.printf "Info_List: \nLetter: %c, Checked: %b, Position: %d\n"
-      info.aletter info.checked info.pos)
+    Printf.printf "Info_List: \nLetter: %c, Dupe: %b, Position: %d\n"
+      info.aletter info.dupe info.pos)
     info_list
 
 let test_answer answer = 
   print_answer (make_info_list answer)
 
-let check_position c pos string guess_pos =
+let check_dupe_position c pos string guess_pos =
   let correct_position = 
     BatString.find_from c pos string in
   correct_position = guess_pos
 
-let rec check_letters info_list answer c pos = 
+let check_position c pos guess =
+  match guess.[pos] = c with 
+  | false -> { letter = c; print_statement = "Incorrect Position." }
+  | true -> { letter = c; print_statement = "Correct." }
+
+let rec check_letters info_list answer c pos guess = 
+  let () = print_answer info_list in
   match info_list with
   | [] -> { letter = c; print_statement = "Incorrect." }
   | h :: t ->
     let () = Printf.printf "character: %s \n" (String.make 1 c) in
-    if h.aletter = c then
+    if h.aletter = c && h.dupe = false then
       let () = print_string ("h.aletter: " ^ String.make 1 h.aletter ^ " char: " ^ String.make 1 c ^ "\n") in
-      if (check_position (String.make 1 c) h.pos answer pos) then
+      check_position c h.pos guess
+    else if h.aletter = c && h.dupe = true then
+      if (check_dupe_position (String.make 1 c) h.pos answer pos) then
         let () = print_string ("checked is false. Correct \n") in
         { letter = c; print_statement = "Correct." }
       else 
         let () = print_string ("h.checked is true. Incorrect Pos \n") in
         { letter = c; print_statement = "Incorrect Position." }
-    else check_letters t answer c pos
+    else check_letters t answer c pos guess
 
-      
 
-let assign_feedback answer c pos= 
+let assign_feedback answer c pos guess= 
   if String.contains answer c = false then
     { letter = c; print_statement = "Incorrect." }
   else let answer_info = make_info_list answer in
-    check_letters answer_info answer c pos
+    check_letters answer_info answer c pos guess
 
   
 let print_feedback answer guess = 
   let feedback_list =
       BatList.mapi
-        (fun pos guess_c -> (pos, assign_feedback answer guess_c pos))
+        (fun pos guess_c -> (pos, assign_feedback answer guess_c pos guess))
         (make_list guess)
     in BatList.iter (fun (pos, feedback) ->
       Printf.printf "%c : %s at %d\n" 
