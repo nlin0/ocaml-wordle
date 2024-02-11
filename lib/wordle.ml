@@ -65,8 +65,8 @@ let make_guess_list answer guess =
 
 let dupe_match contains_dupe c = 
   match contains_dupe with
-      | true -> Printf.printf "%c : %s \n" c (print_feedback RightDuplicate)
-      | false -> Printf.printf "%c : %s \n" c (print_feedback Correct)
+    | true -> Printf.printf "%c : %s \n" c (print_feedback RightDuplicate)
+    | false -> Printf.printf "%c : %s \n" c (print_feedback Correct)
 
 let dupe_no_match contains_dupe answer c = 
   if BatString.contains answer c then 

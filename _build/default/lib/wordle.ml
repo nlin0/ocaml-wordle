@@ -2,7 +2,7 @@
 open Batteries
 
 type guess_info = { letter : char; dupe: bool }
-type answer_info = { aletter : char; dupe : bool; pos : int }
+type answer_info = { aletter : char; dupe : bool}
 type feedback =
   | Correct
   | Incorrect
@@ -27,64 +27,15 @@ let load_valid_guesses () =
   BatList.append list1 list2
 
 let () = Random.self_init ()
-
 let random_word =
   let random_number = 1 + Random.int 2315 in
   let valid_words = load_valid_words () in
   BatList.at valid_words random_number
 
+(* HELPER FUNCTIONS *)
 let make_list str =
   let characters = String.to_list str in
   BatList.of_enum (List.enum characters)
-
-let make_answer_list answer =
-  BatList.mapi (fun pos c ->
-    if BatString.count_char answer c = 1 then
-      { aletter = c; dupe = false; pos = pos }
-    else { aletter = c; dupe = true; pos = pos}) (make_list answer)
-
-let make_guess_list answer guess = 
-  BatList.map (fun c ->
-    if BatString.count_char answer c = 1 then { letter = c; dupe = false }
-    else { letter = c; dupe = true }) (make_list guess)
-
-
-let check_through answer guess =
-  let answer_list = make_answer_list answer in
-  let guess_list = make_guess_list answer guess in
-  BatList.iter2 ( fun ans_info guess_info ->
-    let c = guess_info.letter in
-    match ans_info.aletter = guess_info.letter with
-    | true -> ( match guess_info.dupe with
-        | true -> Printf.printf "%c : %s \n" c (print_feedback RightDuplicate)
-        | false -> Printf.printf "%c : %s \n" c (print_feedback Correct))
-    | false -> ( 
-      if BatString.contains answer c then match guess_info.dupe = true with 
-        |true -> Printf.printf "%c : %s \n" c (print_feedback WrongDuplicate)
-        |false -> Printf.printf "%c : %s \n" c (print_feedback IncorrectPosition)
-      else Printf.printf "%c : %s \n" c (print_feedback Incorrect)
-    )
-
-  ) answer_list guess_list
-
-
-
-
-  (* let guess_list = make_list guess in
-  BatList.iter2
-    (fun ans_info c ->
-      match ans_info.aletter = c with
-      | true -> (match ans_info.dupe with 
-        | true -> Printf.printf "%c : %s \n" c (print_feedback RightDuplicate)
-        | false -> Printf.printf "%c : %s \n" c (print_feedback Correct))
-      | false -> if BatString.contains answer c then (
-        let () = Printf.printf "\n %c is not a dupe \n" c in
-        match ans_info.dupe with 
-        | true -> Printf.printf "%c : %s \n" c (print_feedback WrongDuplicate)
-        | false -> Printf.printf "%c : %s \n" c (print_feedback IncorrectPosition))
-      else Printf.printf "%c : %s \n" c (print_feedback Incorrect)
-      ) answer_list guess_list *)
-
 
 let check answer guess = answer = guess
 
@@ -100,3 +51,38 @@ let validate_word user_input =
 let validate user_input =
   let str_lst = make_list user_input in
   validate_length str_lst && validate_word user_input
+
+let make_answer_list answer =
+  BatList.map (fun c ->
+    if BatString.count_char answer c = 1 then
+      { aletter = c; dupe = false}
+    else { aletter = c; dupe = true}) (make_list answer)
+
+let make_guess_list answer guess = 
+  BatList.map (fun c ->
+    if BatString.count_char answer c = 1 then { letter = c; dupe = false }
+    else { letter = c; dupe = true }) (make_list guess)
+
+let dupe_match contains_dupe c = 
+  match contains_dupe with
+    | true -> Printf.printf "%c : %s \n" c (print_feedback RightDuplicate)
+    | false -> Printf.printf "%c : %s \n" c (print_feedback Correct)
+
+let dupe_no_match contains_dupe answer c = 
+  if BatString.contains answer c then 
+    match contains_dupe = true with 
+    |true -> Printf.printf "%c : %s \n" c (print_feedback WrongDuplicate)
+    |false -> Printf.printf "%c : %s \n" c (print_feedback IncorrectPosition)
+  else Printf.printf "%c : %s \n" c (print_feedback Incorrect)
+
+let check_through answer guess =
+  let answer_list = make_answer_list answer in
+  let guess_list = make_guess_list answer guess in
+  BatList.iter2 ( fun ans_info guess_info ->
+    let c = guess_info.letter in
+    match ans_info.aletter = guess_info.letter with
+    | true -> dupe_match guess_info.dupe c
+    | false -> dupe_no_match guess_info.dupe answer c
+    ) answer_list guess_list
+
+
