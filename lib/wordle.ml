@@ -2,7 +2,7 @@
 open Batteries
 
 type guess_info = { letter : char; dupe: bool }
-type answer_info = { aletter : char; dupe : bool; pos : int }
+type answer_info = { aletter : char; dupe : bool}
 type feedback =
   | Correct
   | Incorrect
@@ -38,15 +38,16 @@ let make_list str =
   BatList.of_enum (List.enum characters)
 
 let make_answer_list answer =
-  BatList.mapi (fun pos c ->
+  BatList.map (fun c ->
     if BatString.count_char answer c = 1 then
-      { aletter = c; dupe = false; pos = pos }
-    else { aletter = c; dupe = true; pos = pos}) (make_list answer)
+      { aletter = c; dupe = false}
+    else { aletter = c; dupe = true}) (make_list answer)
 
 let make_guess_list answer guess = 
   BatList.map (fun c ->
     if BatString.count_char answer c = 1 then { letter = c; dupe = false }
     else { letter = c; dupe = true }) (make_list guess)
+
 
 
 let check_through answer guess =
@@ -63,28 +64,7 @@ let check_through answer guess =
         |true -> Printf.printf "%c : %s \n" c (print_feedback WrongDuplicate)
         |false -> Printf.printf "%c : %s \n" c (print_feedback IncorrectPosition)
       else Printf.printf "%c : %s \n" c (print_feedback Incorrect)
-    )
-
-  ) answer_list guess_list
-
-
-
-
-  (* let guess_list = make_list guess in
-  BatList.iter2
-    (fun ans_info c ->
-      match ans_info.aletter = c with
-      | true -> (match ans_info.dupe with 
-        | true -> Printf.printf "%c : %s \n" c (print_feedback RightDuplicate)
-        | false -> Printf.printf "%c : %s \n" c (print_feedback Correct))
-      | false -> if BatString.contains answer c then (
-        let () = Printf.printf "\n %c is not a dupe \n" c in
-        match ans_info.dupe with 
-        | true -> Printf.printf "%c : %s \n" c (print_feedback WrongDuplicate)
-        | false -> Printf.printf "%c : %s \n" c (print_feedback IncorrectPosition))
-      else Printf.printf "%c : %s \n" c (print_feedback Incorrect)
-      ) answer_list guess_list *)
-
+    )) answer_list guess_list
 
 let check answer guess = answer = guess
 
