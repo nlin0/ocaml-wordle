@@ -18,7 +18,7 @@ let rec prompt_guess secret_word count =
     else if check secret_word user_guess = true then
       print_endline (user_guess ^ " is correct. Good Job, you win!")
     else
-      let () = test_feedback secret_word user_guess in
+      let () = check_through secret_word user_guess in
       prompt_guess secret_word count
 
 let first_guess secret_word user_guess =
@@ -30,7 +30,7 @@ let first_guess secret_word user_guess =
   else if check secret_word user_guess = true then
     print_endline (user_guess ^ " is correct! Good Job, you win.")
   else if check secret_word user_guess <> true then
-    let () = test_feedback secret_word user_guess in
+    let () = check_through secret_word user_guess in
     prompt_guess secret_word 5
 
 let prompt_cheat secret_word =
@@ -38,7 +38,7 @@ let prompt_cheat secret_word =
   prompt_guess secret_word 6
 
 let start () =
-  let secret_word = "trice" in
+  let secret_word = "tweet" in
   (* let secret_word = random_word in *)
   let () =
     print_endline "\nWelcome to Wordle, a word guessing game!";

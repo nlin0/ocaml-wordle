@@ -1,9 +1,15 @@
+(* GAME LOGIC *)
 open Batteries
 
-type feedback = { correct_position : bool; correct_letter : bool; 
-                  print_statement : string }
-type letter_feedback = { letter : char; info : feedback }
-(* GAME LOGIC *)
+type feedback =
+  | Correct
+  | Incorrect
+  | IncorrectPosition
+  | WrongDuplicate
+  | RightDuplicate
+
+type guess_info = { letter : char; print : feedback }
+type answer_info = { aletter : char; dupe : bool; pos : int }
 
 (* loads the dictionary of valid words *)
 let load_valid_words () =
@@ -21,39 +27,92 @@ let random_word =
   let valid_words = load_valid_words () in
   BatList.at valid_words random_number
 
-let assign_feedback answer guess c =
-  if String.contains answer c = false then
-    { letter = c; info = { correct_position = false; correct_letter = false;
-    print_statement = "Incorrect." } }
-  else let correct_position = String.index answer c in
-  match (guess.[correct_position] = c, String.contains answer c) with
-  | true, true ->
-      { letter = c; info = { correct_position = true; correct_letter = true ;
-      print_statement = "Correct."} }
+let make_list str =
+  let characters = String.to_list str in
+  BatList.of_enum (List.enum characters)
 
-  | false, true ->
-      { letter = c; info = { correct_position = false; correct_letter = true;
-      print_statement = "Incorrect Position." } }
-  | _ -> 
-    { letter = c; info = { correct_position = false; correct_letter = false;
-    print_statement = "Incorrect." } }
+let make_answer_list answer =
+  BatList.mapi
+    (fun pos c ->
+      if BatString.count_char answer c = 1 then
+        { aletter = c; dupe = false; pos }
+      else { aletter = c; dupe = true; pos })
+    (make_list answer)
 
-let test_feedback answer guess =
-  let feedback_list = BatList.map (assign_feedback answer guess) (BatString.to_list guess) in
-  BatList.iter (fun feedback ->
-    Printf.printf "%c : %s\n"
-      feedback.letter feedback.info.print_statement
-  ) feedback_list
+let print_feedback = function
+  | Correct -> "Correct."
+  | Incorrect -> "Incorrect."
+  | IncorrectPosition -> "Wrong Position."
+  | WrongDuplicate -> "Wrong Position. Word has duplicates of this letter."
+  | RightDuplicate -> "Correct. Word has duplicates of this letter."
+
+(* let print_answer info_list =
+   BatList.iter
+     (fun info ->
+       Printf.printf "Info_List: \nLetter: %c, dupe: %b, Position: %d\n"
+         info.aletter info.dupe info.pos)
+     info_list *)
+
+let check_through answer guess =
+  let answer_list = make_answer_list answer in
+  let guess_list = make_list guess in
+  BatList.iter2
+    (fun ans_info c ->
+      if ans_info.dupe = true then
+        match ans_info.aletter = c with
+        | true -> Printf.printf "%c : %s \n" c (print_feedback RightDuplicate)
+        | false ->
+            (* add a check that differentiates between incorrect and wrong duplicate *)
+            if BatString.contains answer c then
+              Printf.printf "%c : %s \n" c (print_feedback WrongDuplicate)
+            else Printf.printf "%c : %s \n" c (print_feedback Incorrect)
+      else
+        match ans_info.aletter = c with
+        | true -> Printf.printf "%c : %s \n" c (print_feedback Correct)
+        | false ->
+            Printf.printf "a.letter : %c %c : %s \n" ans_info.aletter c
+              (print_feedback IncorrectPosition))
+    answer_list guess_list
+
+(* let print_feedback answer guess =
+   let feedback_list =
+     BatList.mapi
+       (fun pos guess_c -> (pos, assign_feedback answer guess_c pos guess))
+       (make_list guess)
+   in
+   BatList.iter
+     (fun (pos, feedback) ->
+       Printf.printf "%c : %s at %d\n" feedback.letter feedback.print_statement
+         pos)
+     feedback_list *)
+
+(*
+   let assign_feedback answer guess pos c =
+     if String.contains answer c = false then
+       { letter = c; print_statement = "Incorrect." }
+     else let correct_position = String.index answer c in
+
+       match guess.[correct_position] = c with
+       | true -> (
+           match pos = correct_position with
+           | true -> { letter = c; print_statement = "Correct." }
+           | false -> { letter = c; print_statement = "Incorrect Position." })
+       | false -> { letter = c; print_statement = "Incorrect Position." } *)
+
+(* let print_feedback answer guess =
+   let feedback_list =
+     BatList.mapi
+       (fun pos c -> (pos, assign_feedback answer guess pos c))
+       (make_list guess)
+   in BatList.iter (fun (pos, feedback) ->
+     Printf.printf "%c : %s at %d\n"
+     feedback.letter feedback.print_statement pos)feedback_list *)
 
 (* [check guess] is true or false depending on whether the user has inputted the correct guess *)
 let check answer guess = answer = guess
 
 let lose_prompt word =
   print_string ("You have ran out of lives. The word was " ^ word ^ ". \n")
-
-let make_list str =
-  let characters = String.to_list str in
-  BatList.of_enum (List.enum characters)
 
 let validate_length str_lst = BatList.length str_lst = 5
 
