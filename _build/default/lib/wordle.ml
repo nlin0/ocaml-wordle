@@ -28,38 +28,48 @@ let make_info_list answer =
     BatList.mapi (fun pos c -> {aletter = c ; checked = false ; pos = pos})
     (make_list answer) 
 
-(* let check_letters info_list c =
-  if (info_list.letter = c && info_list.checked = false) then 
-    { letter = c; print_statement = "Correct." }
-  else if (info_list.letter = c && info_list.checked = true) then 
-    { letter = c; print_statement = "Test1." }
-  else { letter = c; print_statement = "Test2." } *)
+let print_answer info_list = 
+  BatList.iter (fun info ->
+    Printf.printf "Info_List: \nLetter: %c, Checked: %b, Position: %d\n"
+      info.aletter info.checked info.pos)
+    info_list
 
-let rec check_letters info_list c = 
+let test_answer answer = 
+  print_answer (make_info_list answer)
+
+let check_position c pos string guess_pos =
+  let correct_position = 
+    BatString.find_from c pos string in
+  correct_position = guess_pos
+
+let rec check_letters info_list answer c pos = 
   match info_list with
   | [] -> { letter = c; print_statement = "Incorrect." }
   | h :: t ->
+    let () = Printf.printf "character: %s \n" (String.make 1 c) in
     if h.aletter = c then
       let () = print_string ("h.aletter: " ^ String.make 1 h.aletter ^ " char: " ^ String.make 1 c ^ "\n") in
-      if h.checked = false then
-        let () = print_string ("h.checked is false. Correct \n") in
+      if (check_position (String.make 1 c) h.pos answer pos) then
+        let () = print_string ("checked is false. Correct \n") in
         { letter = c; print_statement = "Correct." }
       else 
         let () = print_string ("h.checked is true. Incorrect Pos \n") in
         { letter = c; print_statement = "Incorrect Position." }
-    else check_letters t c
+    else check_letters t answer c pos
+
       
 
-let assign_feedback answer c = 
+let assign_feedback answer c pos= 
   if String.contains answer c = false then
     { letter = c; print_statement = "Incorrect." }
   else let answer_info = make_info_list answer in
-    check_letters answer_info c
+    check_letters answer_info answer c pos
 
-let test_feedback answer guess = 
+  
+let print_feedback answer guess = 
   let feedback_list =
       BatList.mapi
-        (fun pos guess_c -> (pos, assign_feedback answer guess_c))
+        (fun pos guess_c -> (pos, assign_feedback answer guess_c pos))
         (make_list guess)
     in BatList.iter (fun (pos, feedback) ->
       Printf.printf "%c : %s at %d\n" 
@@ -78,7 +88,7 @@ let assign_feedback answer guess pos c =
         | false -> { letter = c; print_statement = "Incorrect Position." })
     | false -> { letter = c; print_statement = "Incorrect Position." } *)
 
-(* let test_feedback answer guess =
+(* let print_feedback answer guess =
   let feedback_list =
     BatList.mapi
       (fun pos c -> (pos, assign_feedback answer guess pos c))
