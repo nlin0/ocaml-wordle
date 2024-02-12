@@ -51,7 +51,10 @@ let load_valid_guesses () =
 (** [random_word] is a random word [string] picked from a list of valid guessable words*)
 let random_word =
   let () = Random.self_init () in
-  let random_number = 1 + Random.int 2315 in
+  let load_valid_words () =
+    BatList.of_enum (BatFile.lines_of "../data/text-list.txt") in
+  let total_num = List.length (load_valid_words ()) in
+  let random_number = 1 + Random.int total_num in
   let valid_words = load_valid_words () in
   BatList.at valid_words random_number
 
