@@ -16,8 +16,8 @@ type feedback =
 let print_feedback = function
   | Correct -> "Correct."
   | Incorrect -> "Incorrect."
-  | IncorrectPosition -> "Wrong Position."
-  | WrongDuplicate -> "Wrong Position. Word has duplicates of this letter."
+  | IncorrectPosition -> "Letter Exists."
+  | WrongDuplicate -> "Letter Exists. Word has duplicates of this letter."
   | RightDuplicate -> "Correct. Word has duplicates of this letter."
 
 (** [print_colored_feedback feedbck c color] is [c] and [feedbck] formatted 
@@ -25,8 +25,7 @@ let print_feedback = function
 let print_colored_feedback feedbck c color =
   let str = print_feedback feedbck in
   ANSITerminal.printf
-    [ ANSITerminal.Bold; color; ANSITerminal.on_default ]
-    "%c: " c;
+    [ ANSITerminal.Bold; color; ANSITerminal.on_default ] "%c: " c;
   ANSITerminal.printf [ color; ANSITerminal.on_default ] "%s " str;
   ANSITerminal.printf [ color; ANSITerminal.on_default ] "\n"
 

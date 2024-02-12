@@ -27,8 +27,7 @@ let rec prompt_guess secret_word count =
 (** [first_guess secret_word user_guess] is the prompt when the user makes their first guess [user_guess] without cheating *)
 let first_guess secret_word user_guess =
   match validate user_guess with
-  | false ->
-      let () = style_print 
+  | false -> let () = style_print 
       "Invalid word. Word must be a 5 letter recognized word.\n" in
       prompt_guess secret_word 6
   | true -> (match check secret_word user_guess with
