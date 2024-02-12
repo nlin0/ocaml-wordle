@@ -92,7 +92,7 @@ let validate user_input =
   let str_lst = make_list user_input in
   BatList.length str_lst = 5 && BatList.mem user_input valid_guesses
 
-  (* TESTS *)
+(* TESTS *)
 let%test "too short" =  validate "two" = false
 let%test "too long" = validate "orange" = false
 let%test "empty string" = validate "" = false
