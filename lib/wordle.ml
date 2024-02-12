@@ -75,10 +75,6 @@ let%test "same word" = check "yacht" "yacht" = true
 let%test "different word" = check "human" "speed" = false
 let%test "empty string" = check "" "" = true
 
-(** [style_print string] is the color-ified printed string *)
-let style_print string =
-  ANSITerminal.print_string [ ANSITerminal.white; ANSITerminal.on_black ] string
-
 (** [validate user_input] is a true if [user_input] is a valid input for the wordle game, false otherwise *)
 let validate user_input =
   let valid_guesses = load_valid_guesses () in

@@ -2,6 +2,10 @@
 
 open A2.Wordle
 
+(** [style_print string] is the color-ified printed string *)
+let style_print string =
+  ANSITerminal.print_string [ ANSITerminal.white; ANSITerminal.on_black ] string
+
 (** [lose_prompt word] is the colored printed string informing the player of game over *)
 let lose_prompt word =
   ANSITerminal.print_string
@@ -36,6 +40,11 @@ let rec prompt_guess secret_word count =
           let () = check_through secret_word user_guess in
           prompt_guess secret_word count
 
+(** [prompt_cheat secret_word] is what reveals [secret_word] if the user wants to cheat  *)
+let prompt_cheat secret_word =
+  let () = style_print ("The answer is " ^ secret_word ^ "\n") in
+  prompt_guess secret_word 6
+
 (** [first_guess secret_word user_guess] is the prompt when the user makes their first guess [user_guess] without cheating *)
 let first_guess secret_word user_guess =
   match validate user_guess with
@@ -50,11 +59,6 @@ let first_guess secret_word user_guess =
       | false ->
           let () = check_through secret_word user_guess in
           prompt_guess secret_word 5)
-
-(** [prompt_cheat secret_word] is what reveals [secret_word] if the user wants to cheat  *)
-let prompt_cheat secret_word =
-  let () = style_print ("The answer is " ^ secret_word ^ "\n") in
-  prompt_guess secret_word 6
 
 (** [start ()] is what starts the Wordle game *)
 let start () =
