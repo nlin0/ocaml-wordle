@@ -4,7 +4,6 @@ open Batteries
 
 type guess_info = { letter : char; dupe : bool }
 type answer_info = { aletter : char; dupe : bool }
-
 type feedback =
   | Correct
   | Incorrect
