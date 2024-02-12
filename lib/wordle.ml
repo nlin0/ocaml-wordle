@@ -12,6 +12,7 @@ type feedback =
   | WrongDuplicate
   | RightDuplicate
 
+(** [print_feedback] is the string of the string feedback of each character *)
 let print_feedback = function
   | Correct -> "Correct."
   | Incorrect -> "Incorrect."
@@ -19,37 +20,36 @@ let print_feedback = function
   | WrongDuplicate -> "Wrong Position. Word has duplicates of this letter."
   | RightDuplicate -> "Correct. Word has duplicates of this letter."
 
+(** [print_colored_feedback feedbck c color] is [c] and [feedbck] formatted 
+    and printed with color *)
 let print_colored_feedback feedbck c color =
   let str = print_feedback feedbck in
-
   ANSITerminal.printf
     [ ANSITerminal.Bold; color; ANSITerminal.on_default ]
     "%c: " c;
-  ANSITerminal.printf [ color; ANSITerminal.on_white ] "%s " str;
+  ANSITerminal.printf [ color; ANSITerminal.on_default ] "%s " str;
   ANSITerminal.printf [ color; ANSITerminal.on_default ] "\n"
 
-let print_char_feedback feedbck c =
+(** [color_feedback feedbck c] is colors [c] and [feedbck] green/red/yellow/magenta/cyan depending on [feedbck]*)
+let color_feedback feedbck c =
   match feedbck with
   | Correct -> print_colored_feedback feedbck c ANSITerminal.green
   | Incorrect -> print_colored_feedback feedbck c ANSITerminal.red
   | IncorrectPosition -> print_colored_feedback feedbck c ANSITerminal.yellow
-  | WrongDuplicate -> print_colored_feedback feedbck c ANSITerminal.cyan
-  | RightDuplicate -> print_colored_feedback feedbck c ANSITerminal.green
+  | WrongDuplicate -> print_colored_feedback feedbck c ANSITerminal.magenta
+  | RightDuplicate -> print_colored_feedback feedbck c ANSITerminal.cyan
 
-(** [load_valid_words ()] is the string list of guessable words loaded from 
-    a .txt file*)
+(** [load_valid_words ()] is the string list of guessable words loaded from a .txt file*)
 let load_valid_words () =
   BatList.of_enum (BatFile.lines_of "../data/text-list.txt")
 
-(** [load_valid_guesses ()] is the string list of valid input words 
-    loaded from the text *)
+(** [load_valid_guesses ()] is the string list of valid input words loaded from the text *)
 let load_valid_guesses () =
   let list1 = load_valid_words () in
   let list2 = BatList.of_enum (BatFile.lines_of "../data/answer-list.txt") in
   BatList.append list1 list2
 
-(** [random_word] is a random word [string] picked from a list of valid 
-    guessable words*)
+(** [random_word] is a random word [string] picked from a list of valid guessable words*)
 let random_word =
   let () = Random.self_init () in
   let random_number = 1 + Random.int 2315 in
@@ -57,29 +57,26 @@ let random_word =
   BatList.at valid_words random_number
 
 (* HELPER FUNCTIONS *)
-
 (** [make_list str] is a list consisting of characters of [str] *)
 let make_list str =
   let characters = String.to_list str in
   BatList.of_enum (List.enum characters)
 
-(** [check answer guess] is true when [answer] is the same as [guess], false
-    otherwise *)
+(** [check answer guess] is true when [answer] is the same as [guess], false otherwise *)
 let check answer guess = answer = guess
 
+(** [lose_prompt word] is the printed string informing the player of game over *)
 let lose_prompt word =
   print_string ("You have ran out of lives. The word was " ^ word ^ ". \n")
 
-let validate_length str_lst = BatList.length str_lst = 5
-
-let validate_word user_input =
-  let valid_guesses = load_valid_guesses () in
-  BatList.mem user_input valid_guesses
-
+(** [validate user_input] is a true if [user_input] is a valid input for the wordle game, false otherwise *)
 let validate user_input =
+  let valid_guesses = load_valid_guesses () in
   let str_lst = make_list user_input in
-  validate_length str_lst && validate_word user_input
+  BatList.length str_lst = 5 && BatList.mem user_input valid_guesses
 
+(** [make_answer_list answer] is a list of records containing information of all 
+    the characters in [answer] *)
 let make_answer_list answer =
   BatList.map
     (fun c ->
@@ -87,6 +84,8 @@ let make_answer_list answer =
       else { aletter = c; dupe = true })
     (make_list answer)
 
+(** [make_guess_list answer guess] is a list of records containing information
+    of all the characters in [guess] *)
 let make_guess_list answer guess =
   BatList.map
     (fun c ->
@@ -94,18 +93,21 @@ let make_guess_list answer guess =
       else { letter = c; dupe = true })
     (make_list guess)
 
+(** [dupe_match contains_dupe c] is for obtaining feedback for when the letter is a duplicate and in the correct position *)
 let dupe_match contains_dupe c =
   match contains_dupe with
-  | true -> print_char_feedback RightDuplicate c
-  | false -> print_char_feedback Correct c
+  | true -> color_feedback RightDuplicate c
+  | false -> color_feedback Correct c
 
+(** [dupe_no_match contains_dupe c] is for obtaining feedback for when the letter is a duplicate and in the incorrect position *)
 let dupe_no_match contains_dupe answer c =
   if BatString.contains answer c then
     match contains_dupe = true with
-    | true -> print_char_feedback WrongDuplicate c
-    | false -> print_char_feedback IncorrectPosition c
-  else print_char_feedback Incorrect c
+    | true -> color_feedback WrongDuplicate c
+    | false -> color_feedback IncorrectPosition c
+  else color_feedback Incorrect c
 
+(** [check_through answer guess] is the comparasion of each letter between answer and guess *)
 let check_through answer guess =
   let answer_list = make_answer_list answer in
   let guess_list = make_guess_list answer guess in

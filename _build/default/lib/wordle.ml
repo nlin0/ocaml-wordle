@@ -19,22 +19,24 @@ let print_feedback = function
   | WrongDuplicate -> "Wrong Position. Word has duplicates of this letter."
   | RightDuplicate -> "Correct. Word has duplicates of this letter."
 
+(** [print_colored_feedback feedbck c color] is [c] and [feedbck] formatted 
+    and printed with color *)
 let print_colored_feedback feedbck c color =
   let str = print_feedback feedbck in
-
   ANSITerminal.printf
     [ ANSITerminal.Bold; color; ANSITerminal.on_default ]
     "%c: " c;
-  ANSITerminal.printf [ color; ANSITerminal.on_white ] "%s " str;
+  ANSITerminal.printf [ color; ANSITerminal.on_default ] "%s " str;
   ANSITerminal.printf [ color; ANSITerminal.on_default ] "\n"
 
-let print_char_feedback feedbck c =
+(** [color_feedback feedbck c] is green/red/yellow/magenta/cyan *)
+let color_feedback feedbck c =
   match feedbck with
   | Correct -> print_colored_feedback feedbck c ANSITerminal.green
   | Incorrect -> print_colored_feedback feedbck c ANSITerminal.red
   | IncorrectPosition -> print_colored_feedback feedbck c ANSITerminal.yellow
-  | WrongDuplicate -> print_colored_feedback feedbck c ANSITerminal.cyan
-  | RightDuplicate -> print_colored_feedback feedbck c ANSITerminal.green
+  | WrongDuplicate -> print_colored_feedback feedbck c ANSITerminal.magenta
+  | RightDuplicate -> print_colored_feedback feedbck c ANSITerminal.cyan
 
 (** [load_valid_words ()] is the string list of guessable words loaded from 
     a .txt file*)
@@ -96,15 +98,15 @@ let make_guess_list answer guess =
 
 let dupe_match contains_dupe c =
   match contains_dupe with
-  | true -> print_char_feedback RightDuplicate c
-  | false -> print_char_feedback Correct c
+  | true -> color_feedback RightDuplicate c
+  | false -> color_feedback Correct c
 
 let dupe_no_match contains_dupe answer c =
   if BatString.contains answer c then
     match contains_dupe = true with
-    | true -> print_char_feedback WrongDuplicate c
-    | false -> print_char_feedback IncorrectPosition c
-  else print_char_feedback Incorrect c
+    | true -> color_feedback WrongDuplicate c
+    | false -> color_feedback IncorrectPosition c
+  else color_feedback Incorrect c
 
 let check_through answer guess =
   let answer_list = make_answer_list answer in
